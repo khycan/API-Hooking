@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
 
 
 /*
-	¸ñÀû ÇÁ·Î¼¼½ºÀÇ PID°ªÀ» Ã£´Â ÇÔ¼ö 
-	¼º°ø½Ã PID return 
+	ëª©ì  í”„ë¡œì„¸ìŠ¤ì˜ PIDê°’ì„ ì°¾ëŠ” í•¨ìˆ˜ 
+	ì„±ê³µì‹œ PID return 
 */
 DWORD FindProcessID(LPCTSTR szProcessName)
 {
@@ -67,8 +67,8 @@ DWORD FindProcessID(LPCTSTR szProcessName)
 
 
 /*
-	¸ñÀû ÇÁ·Î¼¼½º¿¡ °¡»ó¸Þ¸ð¸®¸¦ ÇÒ´çÇÏ¿© DLL »ðÀÔ 
-	¼º°ø½Ã TRUE return 
+	ëª©ì  í”„ë¡œì„¸ìŠ¤ì— ê°€ìƒë©”ëª¨ë¦¬ë¥¼ í• ë‹¹í•˜ì—¬ DLL ì‚½ìž… 
+	ì„±ê³µì‹œ TRUE return 
 */
 BOOL InjectDll(DWORD dwPID, LPCTSTR szDllName)
 {
@@ -79,31 +79,31 @@ BOOL InjectDll(DWORD dwPID, LPCTSTR szDllName)
     DWORD dwBufSize = lstrlen(szDllName) + 1;
     LPTHREAD_START_ROUTINE pThreadProc;
      
-    // #1. dwPID ¸¦ ÀÌ¿ëÇÏ¿© ´ë»ó ÇÁ·Î¼¼½º(notepad.exe)ÀÇ HANDLEÀ» ±¸ÇÔ
-    if( !(hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwPID)) )  //½ÇÆÐ½Ã NULL ¼º°ø½Ã ÇÁ·Î¼¼½ºÇÚµé 
+    // dwPID ë¥¼ ì´ìš©í•˜ì—¬ ëŒ€ìƒ í”„ë¡œì„¸ìŠ¤(notepad.exe)ì˜ HANDLEì„ êµ¬í•¨
+    if( !(hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwPID)) )  //ì‹¤íŒ¨ì‹œ NULL ì„±ê³µì‹œ í”„ë¡œì„¸ìŠ¤í•¸ë“¤ 
         return FALSE;
         
-    // #2. ´ë»ó ÇÁ·Î¼¼½º(notepad.exe) ¸Þ¸ð¸®¿¡ szDllName(dwBufSize) Å©±â¸¸Å­ ¸Þ¸ð¸®¸¦ ÇÒ´ç 
-	pRemoteBuf = VirtualAllocEx(hProcess, NULL, dwBufSize, MEM_COMMIT, PAGE_READWRITE); //¼º°ø½Ã ÇÒ´çµÈ ¸Þ¸ð¸® ÁÖ¼Ò(´ë»ó ÇÁ·Î¼¼½º °¡»ó¸Þ¸ð¸®) 
+    // ëŒ€ìƒ í”„ë¡œì„¸ìŠ¤ë©”ëª¨ë¦¬ì— szDllName(dwBufSize) í¬ê¸°ë§Œí¼ ë©”ëª¨ë¦¬ë¥¼ í• ë‹¹ 
+	pRemoteBuf = VirtualAllocEx(hProcess, NULL, dwBufSize, MEM_COMMIT, PAGE_READWRITE); //ì„±ê³µì‹œ í• ë‹¹ëœ ë©”ëª¨ë¦¬ ì£¼ì†Œ(ëŒ€ìƒ í”„ë¡œì„¸ìŠ¤ ê°€ìƒë©”ëª¨ë¦¬) 
      
-    // #3. ÇÒ´ç ¹ÞÀº ¸Þ¸ð¸®¿¡ myhack.dll °æ·Î¸¦ ¾¸
+    // í• ë‹¹ ë°›ì€ ë©”ëª¨ë¦¬ì— myhack.dll ê²½ë¡œë¥¼ ì”€
     ForError = WriteProcessMemory(hProcess, pRemoteBuf, (LPVOID)szDllName, dwBufSize, NULL);
     if( !ForError )
         return FALSE;
      
      
-    // #4. LoadLibraryA() API ÁÖ¼Ò¸¦ ±¸ÇÔ 
+    // LoadLibraryA() API ì£¼ì†Œë¥¼ êµ¬í•¨ 
 	hMod = GetModuleHandle("kernel32.dll");
     pThreadProc = (LPTHREAD_START_ROUTINE)GetProcAddress(hMod,"LoadLibraryA");
      
-    // #5. notepad.exe ÇÁ·Î¼¼½º¿¡ ½º·¹¸¦ ½ÇÇà 
+    // ëŒ€ìƒí”„ë¡œì„¸ìŠ¤ì— ìŠ¤ë ˆë“œë¥¼ ì‹¤í–‰ 
 	hThread = CreateRemoteThread(hProcess, NULL, 0, pThreadProc, pRemoteBuf, 0, NULL);
     WaitForSingleObject(hThread, INFINITE);
      
     CloseHandle(hThread);
     CloseHandle(hProcess);
      
-    printf("¸ðµÎ ³¡³²"); 
+    printf("ëª¨ë‘ ëë‚¨"); 
      
     return TRUE; 
 }
