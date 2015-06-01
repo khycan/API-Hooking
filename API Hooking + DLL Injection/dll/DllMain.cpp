@@ -13,7 +13,7 @@ BYTE g_pOrgBytes[5] = {0,};
 void MyHookFunc(void)
 {
 	UnHookCode();
-	MessageBox(NULL,"you are hacked!","¾Ë¸²",MB_OK);
+	MessageBox(NULL,"you are hacked!","ì•Œë¦¼",MB_OK);
 }
 
 DWORD WINAPI ThreadProc(LPVOID lParam)
@@ -61,31 +61,31 @@ void HookCode(void)
 	DWORD dwOldProtect;
 	BYTE NewBytes[5]={0xE9,0,};
 	
-	// dllÀÇ handleÀ» ±¸ÇÑ µÚ ¸ñÀûÇÔ¼öÀÇ ÁÖ¼Ò¸¦ ±¸ÇÔ 
+	// dllì˜ handleì„ êµ¬í•œ ë’¤ ëª©ì í•¨ìˆ˜ì˜ ì£¼ì†Œë¥¼ êµ¬í•¨ 
 	hMod = GetModuleHandle("KERNEL32.dll");
-    pDestFuncAddr = (LPVOID)GetProcAddress(hMod,"CreateFileW");
+    	pDestFuncAddr = (LPVOID)GetProcAddress(hMod,"CreateFileW");
 	
 	/*
-	      JMP ÁÖ¼Ò °è»ê = (ÀÌµ¿ÇÒ ÁÖ¼Ò) - (ÇöÀç ÁÖ¼Ò) - 5(¸í·É¾î ±æÀÌ)
+	      JMP ì£¼ì†Œ ê³„ì‚° = (ì´ë™í•  ì£¼ì†Œ) - (í˜„ì¬ ì£¼ì†Œ) - 5(ëª…ë ¹ì–´ ê¸¸ì´)
 	*/ 
 	pGapOfAddress = (DWORD)&MyHookFunc - (DWORD)pDestFuncAddr - 5;
  	
- 	// ¸ñÀûÁö ÁÖ¼ÒÀÇ ¿ø·¡ 5¹ÙÀÌÆ®°ªÀ» ¹é¾÷ 
+ 	// ëª©ì ì§€ ì£¼ì†Œì˜ ì›ë˜ 5ë°”ì´íŠ¸ê°’ì„ ë°±ì—… 
 	memcpy(g_pOrgBytes, pDestFuncAddr, 5);
 	
-	// »õ·Î µ¤¾î¾º¿ï 5¹ÙÀÌÆ®°ª 
+	// ìƒˆë¡œ ë®ì–´ì”Œìš¸ 5ë°”ì´íŠ¸ê°’ 
 	memcpy(&NewBytes[1], &pGapOfAddress, 4);
 	
-	//  ¸ñÀûÁö ÁÖ¼ÒÀÇ °¡»ó¸Ş¸ğ¸® ±ÇÇÑ º¯°æ 
+	//  ëª©ì ì§€ ì£¼ì†Œì˜ ê°€ìƒë©”ëª¨ë¦¬ ê¶Œí•œ ë³€ê²½ 
 	/*
-		VirtualProtect(º¯°æÇÒ ½ÃÀÛ ÁÖ¼Ò, º¯°æÇÒ Å©±â(BYTE), »õ·Î ºÎ¿©ÇÒ ±ÇÇÑ, ±âÁ¸ ±ÇÇÑÀ» ÀúÀåÇÒ °ø°£) 
+		VirtualProtect(ë³€ê²½í•  ì‹œì‘ ì£¼ì†Œ, ë³€ê²½í•  í¬ê¸°(BYTE), ìƒˆë¡œ ë¶€ì—¬í•  ê¶Œí•œ, ê¸°ì¡´ ê¶Œí•œì„ ì €ì¥í•  ê³µê°„) 
 	*/
 	VirtualProtect(pDestFuncAddr, 5, PAGE_EXECUTE_READWRITE, &dwOldProtect);
 	
-	// »õ Opcode µ¤¾î¾º¿ò 
+	// ìƒˆ Opcode ë®ì–´ì”Œì›€ 
 	memcpy(pDestFuncAddr, NewBytes, 5);
 	
-	// °¡»ó¸Ş¸ğ¸® ±ÇÇÑ º¹¿ø 
+	// ê°€ìƒë©”ëª¨ë¦¬ ê¶Œí•œ ë³µì› 
 	VirtualProtect(pDestFuncAddr, 5, dwOldProtect, &dwOldProtect);
 }
 
@@ -95,18 +95,18 @@ void UnHookCode(void)
 	HANDLE hProc = NULL;
 	// Destination Function Address
 	LPVOID pDestFuncAddr;
-    DWORD dwOldProtect;
+    	DWORD dwOldProtect;
 	
-	// dllÀÇ handleÀ» ±¸ÇÑ µÚ ¸ñÀûÇÔ¼öÀÇ ÁÖ¼Ò¸¦ ±¸ÇÔ 
+	// dllì˜ handleì„ êµ¬í•œ ë’¤ ëª©ì í•¨ìˆ˜ì˜ ì£¼ì†Œë¥¼ êµ¬í•¨ 
 	hMod = GetModuleHandle("USER32.dll");
-    pDestFuncAddr = (LPVOID)GetProcAddress(hMod,"PostMessageW");
+    	pDestFuncAddr = (LPVOID)GetProcAddress(hMod,"PostMessageW");
     
-    // °¡»ó¸Ş¸ğ¸® ±ÇÇÑ º¯°æ 
+    // ê°€ìƒë©”ëª¨ë¦¬ ê¶Œí•œ ë³€ê²½ 
 	VirtualProtect(pDestFuncAddr, 5, PAGE_EXECUTE_READWRITE, &dwOldProtect);
 	
-	// ¹é¾÷ÇØ µĞ Opcode µ¤¾î¾º¿ò 
+	// ë°±ì—…í•´ ë‘” Opcode ë®ì–´ì”Œì›€ 
 	memcpy(pDestFuncAddr, g_pOrgBytes, 5);
 	
-	// °¡»ó¸Ş¸ğ¸® ±ÇÇÑ º¹¿ø 
+	// ê°€ìƒë©”ëª¨ë¦¬ ê¶Œí•œ ë³µì› 
 	VirtualProtect(pDestFuncAddr, 5, dwOldProtect, &dwOldProtect);
 }
