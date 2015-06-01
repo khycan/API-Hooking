@@ -79,7 +79,7 @@ BOOL InjectDll(DWORD dwPID, LPCTSTR szDllName)
     DWORD dwBufSize = lstrlen(szDllName) + 1;
     LPTHREAD_START_ROUTINE pThreadProc;
      
-    // dwPID 를 이용하여 대상 프로세스(notepad.exe)의 HANDLE을 구함
+    // dwPID 를 이용하여 대상 프로세스의 HANDLE을 구함
     if( !(hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwPID)) )  //실패시 NULL 성공시 프로세스핸들 
         return FALSE;
         
